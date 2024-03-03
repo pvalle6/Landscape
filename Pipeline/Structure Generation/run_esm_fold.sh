@@ -21,7 +21,8 @@ cd $WORK_DIR || exit
 module load python/3.8.5-anaconda-ood
 source /usr/local/packages/python/3.8.5-anaconda/bin/activate landscape
 
-python /ddnA/work/pvalle6/run_esm.py ./sequence.pkl ./saved_exp_structures.pkl pkl
+mkdir ./esm_fold_output/
+python /ddnA/work/pvalle6/run_esm.py ./sequence.pkl ./esm_fold_output/saved_exp_structures.pkl 1
 date
 echo "ESM Fold finished"
 

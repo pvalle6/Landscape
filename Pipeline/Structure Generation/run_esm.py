@@ -12,16 +12,11 @@ import argparse
 import pandas
 from transformers import AutoTokenizer, EsmForProteinFolding
 
-# Here is the full sequence for the WT protein GB1 from csb.org/sequence/3GB1
-# >3GB1_1|Chain A|PROTEIN (B1 DOMAIN OF STREPTOCOCCAL PROTEIN G)|Streptococcus sp. 'group G' (1320)
-# MTYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE
-
 argparse = argparse.ArgumentParser(description="This script is used to extract the"
                                                "sequence data from the two eLife SI files")
 argparse.add_argument("exp_data", help="The path to the experimental data file")
 argparse.add_argument("output", help="The path to the output file")
-argparse.add_argument("output_file_type",
-                      choices="pkl", help="The type of the output file")
+argparse.add_argument("fourth", help="Which 1/4 of the data to process (1, 2, 3, 4)")
 args = argparse.parse_args()
 
 with open(args.exp_data, 'rb') as f:
@@ -42,11 +37,32 @@ def predict_structure(sequence: str, model, tokenizer):
     outputs = model(**inputs)
     return outputs
 
-for combo in structure_dictionary.keys():
-    structure_dictionary.update(
-        {combo: {"Structure": predict_structure(structure_dictionary[combo]["Sequence"], model, tokenizer)}})
 
-# save the data
-if args.output_file_type == "pkl":
-    with open(args.output, 'wb') as f:
-        pkl.dump(structure_dictionary, f)
+total_counter = 0
+save_dict = {}
+
+if args.fourth == "1":
+    start = 0
+    end = int(len(structure_dictionary)/4)
+elif args.fourth == "2":
+    start = int(len(structure_dictionary)/4)
+    end = int(len(structure_dictionary)/2)
+elif args.fourth == "3":
+    start = int(len(structure_dictionary)/2)
+    end = int(len(structure_dictionary)/4)*3
+elif args.fourth == "4":
+    start = int(len(structure_dictionary)/4)*3
+    end = len(structure_dictionary)
+else:
+    raise ValueError("The fourth argument must be 1, 2, 3, or 4")
+
+for combo in list(structure_dictionary.keys())[start:end]:
+    total_counter += 1
+    save_dict.update(
+        {combo: {"Structure": predict_structure(structure_dictionary[combo]["Sequence"], model, tokenizer),
+                 "Fitness": structure_dictionary[combo]["Fitness"]}})
+    if total_counter % 100 == 0:
+        print(f"Predicted {total_counter} structures")
+
+with open(f"{args.fourth}_{total_counter}_{args.output}", 'wb') as f:
+    pkl.dump(save_dict, f)
