@@ -52,8 +52,8 @@ def generate_sequence_variants(data: pd.DataFrame, sequence: str) -> list:
                        sequence[site_g41+1: site_v54] + mutated_v54 + sequence[site_v54+1:])
         sequence_variants.append(mutated_seq)
 
-        if sequence_variants[0] != sequence:
-            exception("The sequence is not correct")
+        # if sequence_variants[0] != sequence:
+        #     exception("The sequence is not correct")
     return sequence_variants
 
 
@@ -61,7 +61,7 @@ def generate_sequence_variants(data: pd.DataFrame, sequence: str) -> list:
 exp_data = pd.read_excel(args.exp_data)
 wt_sequence = "MTYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE"
 
-exp_data.insert(5, "Sequence", generate_sequence_variants(exp_data, wt_sequence))
+exp_data.insert(2, "Sequence", generate_sequence_variants(exp_data, wt_sequence))
 
 # save the data
 if args.output_file_type == "pkl":

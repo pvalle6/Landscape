@@ -1,13 +1,13 @@
 #!/bin/bash
-#PBS -q workq
+#PBS -q single
 #PBS -A hpc_gb1_re_1
-#PBS -l nodes=1:ppn=20
-#PBS -l walltime=3:10:00
-#PBS -o /work/pvalle6/esm_output.txt
-#PBS -e /work/pvalle6/esm_error.txt
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=0:10:00
+#PBS -o /work/pvalle6/check_output.txt
+#PBS -e /work/pvalle6/check_error.txt
 #PBS -m e
 #PBS -M pvalle6@lsu.edu
-#PBS -N esm_fold_9
+#PBS -N check_r
 
 date
 # Set some handy environment variables.
@@ -23,7 +23,7 @@ module load gnuparallel/20190222/intel-19.0.5
 
 source /usr/local/packages/python/3.8.5-anaconda/bin/activate landscape
 
-python ./run_esm.py ./sequence.pkl ./esm_fold_output/ 9
+python ./check_imp.py ./sequence_inf.pkl
 
 date
 echo "ESM Fold finished"
