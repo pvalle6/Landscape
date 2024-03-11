@@ -9,8 +9,9 @@ Peter Vallet 2024
 
 import argparse
 import os
+import numpy as np
 import pickle
-from sklearn.decomposition import IncrementalPCA
+from sklearn.decomposition import IncrementalPCA, PCA
 
 # Parse the arguments
 parser = argparse.ArgumentParser(description="This script is used to perform dimensionality "
@@ -24,11 +25,25 @@ pca_dict = {}
 for file in os.listdir(args.structures):
     with open(os.path.join(args.structures, file), "rb") as f:
         structure = pickle.load(f)
-        pca_dict.update({"variant": structure.keys()[0],
-                         "AtomicPos": structure["Structure"]["positions"], "Fitness": structure["Fitness"]})
+        variant = list(structure.keys())[0]
+        pca_dict.update({variant: {"AtomicPos": structure[variant]["Structure"]["positions"], "Fitness": structure[variant]["Fitness"]}})
+
+# for file in os.listdir(fpath):
+#     with open(os.path.join(fpath, file), "rb") as f:
+#         structure = pickle.load(f)
+#         variant = list(structure.keys())[0]
+#         pca_dict.update({variant: {"AtomicPos": structure[variant]["Structure"]["positions"], "Fitness": structure[variant]["Fitness"]}})
+
 
 # This would be calculation of PCA for the whole data through mini-batch PCA
-transformer = IncrementalPCA(n_components=10, batch_size=5)
+# ipca = IncrementalPCA(n_components=10, batch_size=5)
 # either partially fit on smaller batches of data
-transformer.partial_fit(pca_dict[0:5].positions)
-IncrementalPCA(batch_size=200, n_components=10)
+n_components = 10  # Choose an appropriate value
+pca = PCA(n_components=n_components)
+variant_list = list(pca_dict.keys())
+red_pos = dict()
+for variant in variant_list:
+    flattened_positions = pca_dict[variant]["AtomicPos"].reshape(pca_dict[variant]["AtomicPos"].shape[0], -1)
+    red_pos.update({variant: {"PCA": pca.fit_transform(flattened_positions)}})
+
+
