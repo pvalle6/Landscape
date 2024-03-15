@@ -58,7 +58,7 @@ def generate_sequence_variants(data: pd.DataFrame, sequence: str) -> list:
 
 
 # read in the experimental data
-exp_data = pd.read_excel(args.exp_data)
+exp_data = pd.read_excel(args.exp_data)z
 wt_sequence = "MTYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE"
 
 exp_data.insert(2, "Sequence", generate_sequence_variants(exp_data, wt_sequence))
