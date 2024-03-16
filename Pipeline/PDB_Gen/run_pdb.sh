@@ -2,7 +2,7 @@
 #PBS -q workq
 #PBS -A hpc_gb1_re_1
 #PBS -l nodes=1:ppn=20
-#PBS -l walltime=5:10:00
+#PBS -l walltime=3:10:00
 #PBS -o /work/pvalle6/pdb_gen.txt
 #PBS -e /work/pvalle6/pdb_gen.txt
 #PBS -m e
@@ -23,7 +23,7 @@ module load gnuparallel/20190222/intel-19.0.5
 
 source /usr/local/packages/python/3.8.5-anaconda/bin/activate landscape
 
-python ./esm_to_pdb.py ./esm_fold_test ./pdb_test/ 0
+python ./esm_to_pdb.py ./esm_fold_output/ ./pdb_test/ -1
 
 date
 echo "PDB Generator finished"

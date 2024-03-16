@@ -10,6 +10,7 @@ import os
 import pickle
 from transformers.models.esm.openfold_utils.protein import to_pdb, Protein as OFProtein
 from transformers.models.esm.openfold_utils.feats import atom14_to_atom37
+from pathlib import Path
 
 
 argparse = argparse.ArgumentParser(description="This script is used to convert the "
@@ -20,6 +21,7 @@ argparse.add_argument("range", help="range of structures to convert to PDB files
 args = argparse.parse_args()
 
 parsed_int = int(args.range)
+
 
 if parsed_int == 0:
     start = 0
@@ -51,6 +53,9 @@ elif parsed_int == 8:
 elif parsed_int == 9:
     start = 14000*9
     end = 149361
+elif parsed_int == -1:
+    start = 0
+    end = 5
 else:
     raise ValueError("The twentieth argument must be between 0 and 9")
 
@@ -90,11 +95,13 @@ def convert_esm_to_pdb(outputs):
 
 all_data = {}
 for file in os.listdir(args.fpath)[start:end]:
-    with open(os.path.join(args.fpath, file), "rb") as f:
-        structure = pickle.load(f)
-        variant = list(structure.keys())[0]
-        all_data.update({variant: {"Structure": structure[variant]["Structure"],
-                                   "Fitness": structure[variant]["Fitness"]}})
-        convert_esm_to_pdb(all_data[list(all_data.keys())[0]]["Structure"])
-        all_data = {}
-        print(f"Converted {file} to PDB file")
+    check_name = Path(f"{args.output}{file[:-4]}.pdb")
+    if not check_name.is_file():
+        with open(os.path.join(args.fpath, file), "rb") as f:
+            structure = pickle.load(f)
+            variant = list(structure.keys())[0]
+            all_data.update({variant: {"Structure": structure[variant]["Structure"],
+                                       "Fitness": structure[variant]["Fitness"]}})
+            convert_esm_to_pdb(all_data[list(all_data.keys())[0]]["Structure"])
+            all_data = {}
+            print(f"Converted {file} to PDB file")
